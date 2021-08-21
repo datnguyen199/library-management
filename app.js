@@ -3,11 +3,30 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
+require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+var mongoDBUrl = process.env.MONGODB_URl
+
+try {
+  mongoose.connect(mongoDBUrl, { useNewUrlParser: true , useUnifiedTopology: true});
+  console.log('connect mongoDB successfull!');
+} catch (error) {
+  console.log(error);
+}
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// let Genre = require('./models/genre');
+// Genre.create({ name: 'Fiction', description: 'this is description of fiction' }, function(err, genre) {
+//   if(err) console.log(err)
+//   else console.log('create genre success');
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
