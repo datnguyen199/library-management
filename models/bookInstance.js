@@ -10,6 +10,9 @@ var BookInstanceSchema = new Schema(
         message: '{VALUE} is not valid'
       }
     },
+    rating: {
+      type: Number
+    },
     book: {
       type: Schema.Types.ObjectId, required: true,
       ref: 'Book'

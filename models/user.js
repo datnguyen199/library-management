@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema(
@@ -8,6 +9,10 @@ var UserSchema = new Schema(
       required: true
     },
     lastName: {
+      type: String,
+      required: true
+    },
+    phone: {
       type: String,
       required: true
     },
@@ -27,7 +32,7 @@ var UserSchema = new Schema(
       required: [true, 'please enter your password'],
       validate: [{
         validator: function(v) {
-          return v.length <= 10
+          return v.length <= 255
         },
         message: props => `Password max length is 255 characters`
       }, {
@@ -53,8 +58,36 @@ var UserSchema = new Schema(
     },
     company: {
       type: String
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user'
     }
   }
 )
+
+UserSchema.pre('save', function(next) {
+  var user = this;
+  if(this.isModified('password') || this.isNew) {
+    bcrypt.genSalt(10, function(err, salt) {
+      if(err) return next(err);
+      bcrypt.hash(user.password, salt, null, function(err, hash) {
+        if(err) return next(err);
+        user.password = hash;
+        next();
+      })
+    })
+  } else {
+    next();
+  }
+});
+
+UserSchema.methods.comparePassword = function(password, next) {
+  bcrypt.compare(password, this.password, function(err, isMatch) {
+    if(err) return next(err);
+    next(null, isMatch);
+  })
+}
 
 module.exports = mongoose.model('User', UserSchema);
