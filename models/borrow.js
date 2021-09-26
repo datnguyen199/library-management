@@ -24,10 +24,10 @@ var BorrowSchema = new Schema({
     type: Schema.Types.ObjectId, required: true,
     ref: 'User'
   },
-  bookInstance: {
+  bookInstance: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'BookInstance'
-  }
+  }]
 })
 
 module.exports = mongoose.model('Borrow', BorrowSchema);
