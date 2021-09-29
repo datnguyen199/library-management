@@ -19,20 +19,24 @@ var BookSchema = new Schema({
     required: true
   },
   numberOfPublish: {
-    type: Number
+    type: String
   },
-  author: {
+  ratingAvarage: {
+    type: Number,
+    default: 0
+  },
+  authors: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'Author'
-  },
-  genre: {
+  }],
+  genres: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'Genre'
-  },
-  image: {
+  }],
+  images: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'Image'
-  }
+  }]
 })
 
 module.exports = mongoose.model('Book', BookSchema);

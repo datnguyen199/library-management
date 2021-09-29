@@ -14,9 +14,6 @@ var AuthorSchema = new Schema(
     dateOfBirth: {
       type: Date
     },
-    dateOfDeath: {
-      type: Date
-    },
     summary: {
       type: String,
       maxLength: 1000
