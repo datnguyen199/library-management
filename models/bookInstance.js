@@ -5,10 +5,11 @@ var BookInstanceSchema = new Schema(
   {
     status: {
       type: String,
-      enum: {
-        value: ['available', 'borrowing', 'not available'],
-        message: '{VALUE} is not valid'
-      }
+      enum: ['available', 'borrowing', 'not available'],
+      default: 'available'
+    },
+    price: {
+      type: Number
     },
     book: {
       type: Schema.Types.ObjectId, required: true,

@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 // var userApiRouter = require('./routes/api/user');
 var bookApiRouter = require('./routes/api/book');
+var bookInstanceApiRouter = require('./routes/api/bookInstance');
 
 var app = express();
 
@@ -64,6 +65,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // app.use('/api/v1', userApiRouter);
 app.use('/api/v1', bookApiRouter);
+app.use('/api/v1', bookInstanceApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
