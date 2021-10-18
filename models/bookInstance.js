@@ -13,11 +13,25 @@ var BookInstanceSchema = new Schema(
     rating: {
       type: Number
     },
+    favouriteCount: {
+      type: Number,
+      default: 0
+    },
     book: {
       type: Schema.Types.ObjectId, required: true,
       ref: 'Book'
     }
   }
 )
+
+BookInstanceSchema.methods.updateFavouriteCount = function() {
+  var bookInstance = this;
+
+  return User.count({ favourites: { $in: [bookInstance._id] } }, function(err, count) {
+    bookInstance.favouriteCount = count;
+
+    return bookInstance.save();
+  })
+}
 
 module.exports = mongoose.model('BookInstance', BookInstanceSchema);
