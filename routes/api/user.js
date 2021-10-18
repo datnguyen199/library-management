@@ -1,11 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../../models/user');
-var Genre = require('../../models/genre');
-var passport = require('passport');
 var jwt = require('jsonwebtoken');
+var passportConfig = require('../../config/passport');
 
-require('../../config/passport')(passport);
 require('dotenv').config();
 
 router.post('/sign_up', function(req, res, next) {
@@ -37,7 +35,7 @@ router.post('/sign_in', function(req, res, next) {
     if(!user) return res.status(401).send({ message: 'email or password not valid!' });
     user.comparePassword(req.body.password, function(err, isMatch) {
       if(isMatch && !err) {
-        let payload = { id: user.id };
+        let payload = { id: user._id };
         var token = jwt.sign(payload, 'jwt_scret_key');
         res.status(201).send({
           message: 'login successfull',
@@ -78,6 +76,11 @@ router.delete('/users/:id', async function(req, res, next) {
     else if(err) res.status(422).send({ message: err });
     else res.status(201).send({ message: `Deleted success user with id = ${user['value']['_id']}` });
   })
+});
+
+router.get('/protected', passportConfig.passport.authenticate('jwt', { session: false }), function(req, res, next) {
+  let currentUser = req.user;
+  res.status(200).send({ message: currentUser });
 });
 
 module.exports = router;
