@@ -93,16 +93,16 @@ UserSchema.methods.comparePassword = function(password, next) {
   })
 }
 
-UserSchema.methods.favourite = function(favouriteId) {
-  if(this.favourite.indexOf(favouriteId) < 0) {
-    this.favourites.push(favouriteId);
+UserSchema.methods.favourite = function(bookInstanceId) {
+  if(this.favourites.indexOf(bookInstanceId) < 0) {
+    this.favourites.push(bookInstanceId);
   }
 
   return this.save();
 }
 
-UserSchema.methods.unfavorite = function(favouriteId){
-  this.favourites.remove(favouriteId);
+UserSchema.methods.unfavourite = function(bookInstanceId){
+  this.favourites.remove(bookInstanceId);
 
   return this.save();
 };
