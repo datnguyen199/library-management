@@ -4,16 +4,22 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+
 require('dotenv').config();
+var passportConfig = require('./config/passport');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-// var userApiRouter = require('./routes/api/user');
 var bookApiRouter = require('./routes/api/book');
+var userApiRouter = require('./routes/api/user');
 
 var app = express();
 
 var mongoDBUrl = process.env.MONGODB_URL;
+
+// mongodb+srv://libraryAdmin1:Aa%4012345678@mee6copycluster-shard-00-00.r86qy.mongodb.net/admin?retryWrites=true&w=majority
+// mongodb://libraryAdmin1:Aa%4012345678@mee6copycluster-shard-00-00.r86qy.mongodb.net:27017,mee6copycluster-shard-00-01.r86qy.mongodb.net:27017,mee6copycluster-shard-00-02.r86qy.mongodb.net:27017/library_management?ssl=true&replicaSet=atlas-5r6qbu-shard-0&authSource=admin&retryWrites=true&w=majority
+// mongodb://admin:1234@cluster0.l8qu8.mongodb.net:27017/
 
 // try {
 //   mongoose.connect(mongoDBUrl, { useNewUrlParser: true , useUnifiedTopology: true});
@@ -31,24 +37,15 @@ mongoose
  .then(() => console.log("Database connected!"))
  .catch(err => console.log(err));
 
-var conn = mongoose.connection;
-conn.on('error', console.error.bind(console, 'MongoDB connection error:'));
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// conn.on('open', function () {
-//   conn.db.listCollections().toArray(function (err, collectionNames) {
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-//     console.log(collectionNames);
-//   });
-// });
-
-// let Genre = require('./models/genre');
-// Genre.create({ name: 'Fiction', description: 'this is description of fiction' }, function(err, genre) {
-//   if(err) console.log(err)
-//   else console.log('create genre success');
-// });
+let Genre = require('./models/genre');
+Genre.deleteMany({}, function() {});
+Genre.create({ name: 'Fiction', description: 'this is description of fiction' }, function(err, genre) {
+  if(err) console.log(err)
+  else console.log('create genre success');
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -59,11 +56,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passportConfig.passport.initialize());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-// app.use('/api/v1', userApiRouter);
 app.use('/api/v1', bookApiRouter);
+app.use('/api/v1', userApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
