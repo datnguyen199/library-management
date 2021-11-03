@@ -5,13 +5,15 @@ var BookInstanceSchema = new Schema(
   {
     status: {
       type: String,
-      enum: {
-        value: ['available', 'borrowing', 'not available'],
-        message: '{VALUE} is not valid'
-      }
+      enum: ['available', 'borrowing', 'not available'],
+      default: 'available'
     },
     rating: {
       type: Number
+    },
+    favouriteCount: {
+      type: Number,
+      default: 0
     },
     book: {
       type: Schema.Types.ObjectId, required: true,
@@ -19,5 +21,15 @@ var BookInstanceSchema = new Schema(
     }
   }
 )
+
+BookInstanceSchema.methods.updateFavouriteCount = function() {
+  var bookInstance = this;
+
+  return User.count({ favourites: { $in: [bookInstance._id] } }, function(err, count) {
+    bookInstance.favouriteCount = count;
+
+    return bookInstance.save();
+  })
+}
 
 module.exports = mongoose.model('BookInstance', BookInstanceSchema);

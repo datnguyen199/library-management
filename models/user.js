@@ -63,7 +63,10 @@ var UserSchema = new Schema(
       type: String,
       enum: ['user', 'admin'],
       default: 'user'
-    }
+    },
+    favourites: [{
+      type: Schema.Types.ObjectId, ref: 'BookInstance'
+    }],
   }
 )
 
@@ -89,5 +92,19 @@ UserSchema.methods.comparePassword = function(password, next) {
     next(null, isMatch);
   })
 }
+
+UserSchema.methods.favourite = function(bookInstanceId) {
+  if(this.favourites.indexOf(bookInstanceId) < 0) {
+    this.favourites.push(bookInstanceId);
+  }
+
+  return this.save();
+}
+
+UserSchema.methods.unfavourite = function(bookInstanceId){
+  this.favourites.remove(bookInstanceId);
+
+  return this.save();
+};
 
 module.exports = mongoose.model('User', UserSchema);
