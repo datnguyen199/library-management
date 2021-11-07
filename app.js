@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 var bookApiRouter = require('./routes/api/book');
 var userApiRouter = require('./routes/api/user');
 var bookInstanceApiRouter = require('./routes/api/bookInstance');
+var bookOwningApiRouter = require('./routes/api/bookOwning');
 
 var app = express();
 
@@ -32,6 +33,7 @@ var mongoDBUrl = process.env.MONGODB_URL;
 mongoose
  .connect(mongoDBUrl, {
         useNewUrlParser: true,
+        poolSize: 10, // 10 operations can run at a time
         useUnifiedTopology: true,
         useCreateIndex: true,
         serverSelectionTimeoutMS: 20000 });
@@ -64,6 +66,7 @@ app.use('/users', usersRouter);
 app.use('/api/v1', bookApiRouter);
 app.use('/api/v1', userApiRouter);
 app.use('/api/v1', bookInstanceApiRouter);
+app.use('/api/v1', bookOwningApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
