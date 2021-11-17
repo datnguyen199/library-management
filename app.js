@@ -34,19 +34,19 @@ mongoose
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
-        serverSelectionTimeoutMS: 20000 })
- .then(() => console.log("Database connected!"))
- .catch(err => console.log(err));
+        serverSelectionTimeoutMS: 20000 });
+//  .then(() => console.log("Database connected!"))
+//  .catch(err => console.log(err));
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-let Genre = require('./models/genre');
-Genre.deleteMany({}, function() {});
-Genre.create({ name: 'Fiction', description: 'this is description of fiction' }, function(err, genre) {
-  if(err) console.log(err)
-  else console.log('create genre success');
-});
+// let Genre = require('./models/genre');
+// Genre.deleteMany({}, function() {});
+// Genre.create({ name: 'Fiction', description: 'this is description of fiction' }, function(err, genre) {
+//   if(err) console.log(err)
+//   else console.log('create genre success');
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
