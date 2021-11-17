@@ -25,14 +25,20 @@ var BookSchema = new Schema({
     type: Number,
     default: 0
   },
-  authors: [{
-    type: Schema.Types.ObjectId, required: true,
-    ref: 'Author'
-  }],
-  genres: [{
-    type: Schema.Types.ObjectId, required: true,
-    ref: 'Genre'
-  }],
+  authors: {
+    type: [{
+      type: Schema.Types.ObjectId, required: true,
+      ref: 'Author'
+    }],
+    validate: [(val) => val.length >= 1, 'Must have at least 1 author']
+  },
+  genres: {
+    type: [{
+      type: Schema.Types.ObjectId, required: true,
+      ref: 'Genre'
+    }],
+    validate: [(val) => val.length >= 1, 'Must have at least 1 genre']
+  },
   images: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'Image'

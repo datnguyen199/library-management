@@ -14,3 +14,5 @@ factory.define('user', User, {
   role: 'user',
   favourites: []
 });
+
+factory.extend('user', 'admin', { role: 'admin' });
