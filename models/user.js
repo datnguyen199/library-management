@@ -18,6 +18,7 @@ var UserSchema = new Schema(
     },
     email: {
       type: String,
+      unique: true,
       validate: {
         validator: function(v) {
           let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;

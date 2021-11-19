@@ -22,7 +22,7 @@ router.post('/sign_up', function(req, res, next) {
 
     user.save(function(err, user) {
       if(err) res.status(422).send({ errors: err.errors });
-      else res.status(200).send({ data: user });
+      else res.status(201).send({ data: user });
     });
   } catch(err) {
     res.status(500).send({ errors: err });
@@ -37,7 +37,7 @@ router.post('/sign_in', function(req, res, next) {
       if(isMatch && !err) {
         let payload = { id: user._id };
         var token = jwt.sign(payload, 'jwt_scret_key');
-        res.status(201).send({
+        res.status(200).send({
           message: 'login successfull',
           accessToken: token
         });
