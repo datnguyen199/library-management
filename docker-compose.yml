@@ -1,0 +1,49 @@
+version: "3.4"
+
+services:
+  lib_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/lib_app
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - db
+  db:
+    image: mongo
+    # networks:
+    #   - alphanetwork
+    # volumes:
+      # - .docker/data/db:/data/db
+      # - .docker/mongo/data1/db:/data/db # This is where your volume will persist. e.g. VOLUME-DIR = ./volumes/mongodb
+      # - .docker/mongo/data1/configdb:/data/configdb
+    # restart: unless-stopped
+    # ports:
+    #   - "27017:27017"
+    volumes:
+      - ./scripts:/scripts
+      # - /home/temp/mongo/compose/data:/data/db
+    entrypoint:
+      - /scripts/initiate_replica.sh
+    depends_on:
+      - mongodb1
+  mongodb1:
+    image: mongo
+    # networks:
+    #   - alphanetwork
+    # volumes:
+    #   - data1:/data/db
+    #   - config1:/data/configdb
+    # restart: unless-stopped
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+# networks:
+#   alphanetwork:
