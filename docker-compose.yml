@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/lib_app
+      - /lib_app/.docker
     env_file:
       - ./.env
     restart: unless-stopped
@@ -14,10 +15,17 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - db
+    networks:
+      - db-network
+    # healthcheck:
+    #   test: wget --quiet --tries=1 --spider http://localhost:${PORT} || exit 1z
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
   db:
     image: mongo
-    # networks:
-    #   - alphanetwork
+    networks:
+      - db-network
     # volumes:
       # - .docker/data/db:/data/db
       # - .docker/mongo/data1/db:/data/db # This is where your volume will persist. e.g. VOLUME-DIR = ./volumes/mongodb
@@ -27,23 +35,26 @@ services:
     #   - "27017:27017"
     volumes:
       - ./scripts:/scripts
-      # - /home/temp/mongo/compose/data:/data/db
     entrypoint:
       - /scripts/initiate_replica.sh
     depends_on:
       - mongodb1
   mongodb1:
     image: mongo
-    # networks:
-    #   - alphanetwork
-    # volumes:
-    #   - data1:/data/db
-    #   - config1:/data/configdb
-    # restart: unless-stopped
+    networks:
+      - db-network
+    volumes:
+      - .docker/data/db:/data/db
+    restart: unless-stopped
     ports:
       - "27017:27017"
     expose:
       - "27017"
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-# networks:
-#   alphanetwork:
+    # healthcheck:
+    #   test: echo 'db.runCommand("ping").ok' | mongo db:27017/speech-api --quiet
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+networks:
+  db-network:

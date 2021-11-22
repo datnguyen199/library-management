@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "serverstart": "DEBUG=library-management:* npm run devstart",
-    "test": "env-cmd -f ./tests/test.env jest --watch"
+    "test": "env-cmd -f ./tests/test.env jest --watch",
+    "dockertest": "env-cmd -f ./tests/test.env jest --watchAll"
   },
   "jest": {
     "testEnvironment": "node"

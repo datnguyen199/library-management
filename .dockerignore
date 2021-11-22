@@ -1,0 +1,9 @@
+./.docker
+**/node_modules
+**/.dockerignore
+**/.env*
+**/.git
+**/.gitignore
+**/docker-compose*
+**/Dockerfile*
+README.md
