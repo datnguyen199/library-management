@@ -12,10 +12,8 @@ var BorrowSchema = new Schema({
   },
   status: {
     type: String,
-    enum: {
-      value: ['borrowing', 'returned', 'cancelled'],
-      message: '{VALUE} is not valid'
-    }
+    enum: ['waiting_confirm', 'borrowing', 'returned', 'cancelled'],
+    default: 'waiting_confirm'
   },
   notes: {
     type: String
@@ -24,10 +22,22 @@ var BorrowSchema = new Schema({
     type: Schema.Types.ObjectId, required: true,
     ref: 'User'
   },
-  bookInstance: [{
+  bookInstances: [{
     type: Schema.Types.ObjectId, required: true,
     ref: 'BookInstance'
   }]
 })
+
+BorrowSchema.statics.findWithUserADayBeforeReturn = function(today) {
+  let tommorow = today.setDate(today.getDate() + 1);
+  return this.find({ returnDate: tommorow }, 'user').populate([
+    { path: 'user', select: 'firstName lastName email' },
+    {
+      path: 'bookInstances', select: '_id', populate: {
+        path: 'book', select: 'title _id'
+      }
+    }
+  ]);
+}
 
 module.exports = mongoose.model('Borrow', BorrowSchema);
