@@ -13,6 +13,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
+    "agenda": "^4.2.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^10.0.0",
@@ -22,6 +23,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.5",
     "morgan": "~1.9.1",
+    "nodemailer": "^6.7.1",
+    "nodemailer-sendgrid": "^1.0.3",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "pug": "2.0.0-beta11"
