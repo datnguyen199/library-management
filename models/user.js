@@ -67,9 +67,18 @@ var UserSchema = new Schema(
     },
     favourites: [{
       type: Schema.Types.ObjectId, ref: 'BookInstance'
-    }],
+    }]
   }
 )
+
+UserSchema.virtual('bookBasket', {
+  ref: 'BookBasket',
+  localField: '_id',
+  foreignField: 'user'
+});
+
+UserSchema.set('toJSON', { getters: true, virtuals: true });
+UserSchema.set('toObject', { getters: true, virtuals: true });
 
 UserSchema.pre('save', function(next) {
   var user = this;
@@ -86,6 +95,10 @@ UserSchema.pre('save', function(next) {
     next();
   }
 });
+
+UserSchema.pre('findOne', function() {
+  this.populate('bookBasket');
+})
 
 UserSchema.methods.comparePassword = function(password, next) {
   bcrypt.compare(password, this.password, function(err, isMatch) {

@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+const moment = require('moment');
 var Schema = mongoose.Schema;
 
 var BorrowSchema = new Schema({
@@ -8,14 +9,23 @@ var BorrowSchema = new Schema({
   },
   returnDate: {
     type: Date,
-    required: true
+    required: true,
+    validate: [
+      {
+        validator: function(value) {
+          return moment(new Date(this.borrowDate)).isBefore(moment(new Date(value)));
+        },
+        message: 'please enter borrow date less than return date'
+      }
+    ]
+  },
+  actualReturnDate: {
+    type: Date
   },
   status: {
     type: String,
-    enum: {
-      value: ['borrowing', 'returned', 'cancelled'],
-      message: '{VALUE} is not valid'
-    }
+    enum: ['waiting_confirm', 'borrowing', 'returned', 'cancelled'],
+    default: 'waiting_confirm'
   },
   notes: {
     type: String
@@ -24,10 +34,13 @@ var BorrowSchema = new Schema({
     type: Schema.Types.ObjectId, required: true,
     ref: 'User'
   },
-  bookInstance: [{
-    type: Schema.Types.ObjectId, required: true,
-    ref: 'BookInstance'
-  }]
-})
+  bookInstances: {
+    type:[{
+      type: Schema.Types.ObjectId, required: true,
+      ref: 'BookInstance'
+    }],
+    validate: [(val) => val.length >= 1, 'Must have at least 1 book']
+  }
+}, { optimisticConcurrency: true })
 
 module.exports = mongoose.model('Borrow', BorrowSchema);
