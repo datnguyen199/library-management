@@ -17,20 +17,23 @@ router.post('/basket_adding/:bookInstanceId', passportConfig.passport.authentica
 });
 
 router.post('/basket_removing/:bookInstanceId', passportConfig.passport.authenticate('jwt', { session: false }), function(req, res, next) {
-  let currentUser = req.user;
+  let currentUser = req.user,
+    bookBasket = currentUser.bookBasket[0];
   if(currentUser.role != 'user') return res.status(403).send({ message: 'not allow with this role!' });
+  if(!bookBasket || bookBasket.books.length < 1) return res.status(400).send({ message: 'Basket is empty!' });
 
-  let bookBasket = currentUser.bookBasket[0];
   bookBasket.removeBookFromBasket(req.params.bookInstanceId).then(function (basket){
     res.status(200).send({ data: basket });
   })
 });
 
 router.get('/book_baskets', passportConfig.passport.authenticate('jwt', { session: false }), function(req, res, next) {
-  let currentUser = req.user;
+  let currentUser = req.user,
+    bookBasket = currentUser.bookBasket[0];
   if(currentUser.role != 'user') return res.status(403).send({ message: 'not allow with this role!' });
+  if(!bookBasket || bookBasket.books.length < 1) return res.status(200).send({ message: 'Basket is empty!' });
 
-  BookBasket.findOne({ _id: currentUser.bookBasket[0].id })
+  BookBasket.findOne({ _id: currentUser.bookBasket[0].id }).lean()
     .populate({
       path: 'books',
       populate: { path: 'book' }
@@ -41,8 +44,10 @@ router.get('/book_baskets', passportConfig.passport.authenticate('jwt', { sessio
 });
 
 router.post('/borrowing', passportConfig.passport.authenticate('jwt', { session: false }), async function(req, res, next) {
-  let currentUser = req.user;
+  let currentUser = req.user,
+    bookBasket = currentUser.bookBasket[0];
   if(currentUser.role != 'user') return res.status(403).send({ message: 'User role is not valid!' });
+  if(!bookBasket || bookBasket.books.length < 1) return res.status(400).send({ message: 'Basket is empty, please choose book before borrowing!' });
 
   const conn = await mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
@@ -51,7 +56,6 @@ router.post('/borrowing', passportConfig.passport.authenticate('jwt', { session:
   session.startTransaction();
   try {
     let { borrowDate, returnDate, notes } = req.body['borrowing'],
-      bookBasket = currentUser.bookBasket[0],
       bookArr = bookBasket.books;
     const borrowing = new Borrow({
       borrowDate: borrowDate,

@@ -24,8 +24,8 @@ var BorrowSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['borrowing', 'returned', 'cancelled'],
-    default: 'borrowing'
+    enum: ['waiting_confirm', 'borrowing', 'returned', 'cancelled'],
+    default: 'waiting_confirm'
   },
   notes: {
     type: String
@@ -34,10 +34,13 @@ var BorrowSchema = new Schema({
     type: Schema.Types.ObjectId, required: true,
     ref: 'User'
   },
-  bookInstances: [{
-    type: Schema.Types.ObjectId, required: true,
-    ref: 'BookInstance'
-  }]
+  bookInstances: {
+    type:[{
+      type: Schema.Types.ObjectId, required: true,
+      ref: 'BookInstance'
+    }],
+    validate: [(val) => val.length >= 1, 'Must have at least 1 book']
+  }
 }, { optimisticConcurrency: true })
 
 module.exports = mongoose.model('Borrow', BorrowSchema);
