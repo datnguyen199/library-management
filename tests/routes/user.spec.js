@@ -45,6 +45,19 @@ describe('POST /sign_up', () => {
     expect(res.status).toBe(422);
     expect(numberUser).toBe(1);
   })
+
+  test('sign up success with duplicated email but difference type', async () => {
+    let socialUser = await factory.create('user', { type: 'social' });
+    let userParams = await factory.attrs('user');
+    userParams['email'] = socialUser.email;
+    userParams['type'] = 'normal';
+    let res = await request(app).post('/api/v1/sign_up')
+                                .send(userParams);
+
+    let numberUser = await User.estimatedDocumentCount({});
+    expect(res.status).toBe(201);
+    expect(numberUser).toBe(2);
+  })
 })
 
 describe('POST /sign_in', () => {

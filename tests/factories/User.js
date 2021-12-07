@@ -12,6 +12,7 @@ factory.define('user', User, {
   dateOfBirth: faker.date.between('1999-01-01', '2021-12-31'),
   company: faker.company.companyName(),
   role: 'user',
+  type: 'normal',
   favourites: []
 });
 

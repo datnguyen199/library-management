@@ -30,7 +30,7 @@ router.post('/sign_up', function(req, res, next) {
 });
 
 router.post('/sign_in', function(req, res, next) {
-  User.findOne({ email: req.body.email }, function(err, user) {
+  User.findOne({ email: req.body.email, type: 'normal' }, function(err, user) {
     if(err) return res.status(500).send({ message: err });
     if(!user) return res.status(401).send({ message: 'email or password not valid!' });
     user.comparePassword(req.body.password, function(err, isMatch) {
@@ -48,34 +48,19 @@ router.post('/sign_in', function(req, res, next) {
   })
 })
 
-router.get('/users', function(req, res, next) {
-  User.find().then(rs => res.status(200).send(rs));
+router.get('/auth/google', passportConfig.passport.authenticate('google', {
+    session: false, scope: ['profile', 'email'],
+  })
+);
+
+router.get('/auth/google/callback', passportConfig.passport.authenticate('google', { session: false }), (req, res) => {
+  let payload = { id: req.user._id };
+  var accessToken = jwt.sign(payload, 'jwt_scret_key');
+  res.status(200).send({ message: 'login success', accessToken: accessToken });
 });
 
-router.put('/users/:id', async function(req, res, next) {
-  let rs = await User.findOneAndUpdate(
-    { email: 'xxxx' },
-    { lastName: 'this is update last name' },
-    { new: true, upsert: true }
-  )
-  console.log(rs);
-  res.status(201).send({ message: 'save successfull!' });
-  // let user = await User.findOne({ _id: req.params.id });
-  // console.log('==================>' + req.params.id);
-  // if(!user) res.status(401).send({ message: 'User not found!' });
-
-  // user.firstName = 'this is new first name';
-  // user.save(function(err, user) {
-  //   res.status(201).send({ message: 'save successfull!' });
-  // });
-})
-
-router.delete('/users/:id', async function(req, res, next) {
-  User.findByIdAndRemove({ _id: req.params.id }, { rawResult: true }, function(err, user) {
-    if(!user) res.status(404).send({ message: 'User not found' });
-    else if(err) res.status(422).send({ message: err });
-    else res.status(201).send({ message: `Deleted success user with id = ${user['value']['_id']}` });
-  })
+router.get('/current_user', (req, res) => {
+  res.status(200).send(req.user);
 });
 
 router.get('/protected', passportConfig.passport.authenticate('jwt', { session: false }), function(req, res, next) {

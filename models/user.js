@@ -14,11 +14,10 @@ var UserSchema = new Schema(
     },
     phone: {
       type: String,
-      required: true
+      required: [function() { return this.type !== 'social' }, 'please enter your phone']
     },
     email: {
       type: String,
-      unique: true,
       validate: {
         validator: function(v) {
           let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -30,7 +29,7 @@ var UserSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, 'please enter your password'],
+      required: [function() { return this.type !== 'social' }, 'please enter your password'],
       validate: [{
         validator: function(v) {
           return v.length <= 255
@@ -46,7 +45,7 @@ var UserSchema = new Schema(
     },
     idNumber: {
       type: String,
-      required: true,
+      required: [function() { return this.type !== 'social' }, 'please enter your id number'],
       validate: {
         validator: function(v) {
           return /^\d+$/.test(v) && v.length == 11;
@@ -64,6 +63,11 @@ var UserSchema = new Schema(
       type: String,
       enum: ['user', 'admin'],
       default: 'user'
+    },
+    type: {
+      type: String,
+      enum: ['normal', 'social'],
+      default: 'normal'
     },
     favourites: [{
       type: Schema.Types.ObjectId, ref: 'BookInstance'
@@ -120,5 +124,7 @@ UserSchema.methods.unfavourite = function(bookInstanceId){
 
   return this.save();
 };
+
+UserSchema.index({ email: 1, type: 1 }, { name: 'unique_email_and_type', unique: true });
 
 module.exports = mongoose.model('User', UserSchema);
