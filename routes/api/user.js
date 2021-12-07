@@ -30,7 +30,7 @@ router.post('/sign_up', function(req, res, next) {
 });
 
 router.post('/sign_in', function(req, res, next) {
-  User.findOne({ email: req.body.email }, function(err, user) {
+  User.findOne({ email: req.body.email, type: 'normal' }, function(err, user) {
     if(err) return res.status(500).send({ message: err });
     if(!user) return res.status(401).send({ message: 'email or password not valid!' });
     user.comparePassword(req.body.password, function(err, isMatch) {
@@ -49,12 +49,14 @@ router.post('/sign_in', function(req, res, next) {
 })
 
 router.get('/auth/google', passportConfig.passport.authenticate('google', {
-    scope: ['profile', 'email'],
+    session: false, scope: ['profile', 'email'],
   })
 );
 
-router.get('/auth/google/callback', passportConfig.passport.authenticate('google'), (req, res) => {
-  res.status(200).send({ message: 'login success', user: req.user });
+router.get('/auth/google/callback', passportConfig.passport.authenticate('google', { session: false }), (req, res) => {
+  let payload = { id: req.user._id };
+  var accessToken = jwt.sign(payload, 'jwt_scret_key');
+  res.status(200).send({ message: 'login success', accessToken: accessToken });
 });
 
 router.get('/current_user', (req, res) => {
